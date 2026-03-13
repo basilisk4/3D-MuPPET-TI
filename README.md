@@ -12,6 +12,11 @@ We offer code and scripts for training and inference.
 **Abstract:**\
 In this paper, we present a texture-independent approach to estimate and track 3D joint positions of multiple pigeons. For this purpose, we build upon the existing 3D-MuPPET framework, which estimates and tracks the 3D poses of up to 10 pigeons using a multi-view camera setup. We extend this framework by using a segmentation method that generates silhouettes of the individuals, which are then used to estimate 2D keypoints. Following 3D-MuPPET, these 2D keypoints are triangulated to infer 3D poses, and identities are matched in the first frame and tracked in 2D across subsequent frames. Our proposed texture-independent approach achieves comparable accuracy to the original texture-dependent 3D-MuPPET framework. Additionally, we explore our approach's applicability to other bird species. To do that, we infer the 2D joint positions of four bird species without additional fine-tuning the model trained on pigeons and obtain preliminary promising results. Thus, we think that our approach serves as a solid foundation and inspires the development of more robust and accurate texture-independent pose estimation frameworks.
 
+## Addition
+An additional model version was added after the paper ["Towards Texture- And Shape-Independent 3D Keypoint Estimation in Birds"](https://arxiv.org/abs/2505.16633). The DLC-TI model differs from the DLCSAM model in the way the segmentation model (SAM) is used. Instead of applying SAM directly to the detected bounding box, SAM receives a 1024 × 1024 pixel crop centered around the bounding box. 
+
+This larger contextual crop leads to significantly improved silhouettes, which in turn improves the accuracy of the predicted keypoints.
+
 ## Prerequisites
 
 The presented framework is a texture independent adaption of [3D-MuPPET](https://alexhang212.github.io/3D-MuPPET/). The majority of the code is therefore based on the origial 3D-MuPPET.
@@ -45,8 +50,8 @@ the [3D-POP dataset](https://github.com/alexhang212/Dataset-3DPOP).
 ### Inference Scripts
 If you run the scripts with the following commands, this will use the pre-trained weights from 3D-MuPPET. If you want to specify custom weights/ checkpoints, you can input it as argument. Use ` -h ` to find out what argument names to use.
 
-1.  **DLCSAM**:
 > Note: The DeepLabCut weight parameter is the directory for the exported model.
+1.  **DLCSAM**:
 ```bash
 # 2D Inference
 python Inference/YOLODLCSAM_2DInference.py --input [input_video] 
@@ -54,13 +59,20 @@ python Inference/YOLODLCSAM_2DInference.py --input [input_video]
 python Inference/YOLODLCSAM_3DInference.py --dataset [3dpop_path] --seq [3dpop_sequence]
 ```
 
-2. **DLCISO***:
-> Note: The DeepLabCut weight parameter is the directory for the exported model.
+2. **DLCISO**:
 ```bash
 # 2D Inference
 python Inference/YOLODLCISO_2DInference.py --input [input_video] 
 # 3D Inference
 python Inference/YOLODLCISO_3DInference.py --dataset [3dpop_path] --seq [3dpop_sequence]
+```
+
+3. **DLC-TI**:
+```bash
+# 2D Inference
+python Inference/YOLODLC-TI_2DInference.py --input [input_video] 
+# 3D Inference
+python Inference/YOLODLC-TI_3DInference.py --dataset [3dpop_path] --seq [3dpop_sequence]
 ```
 
 
@@ -77,6 +89,10 @@ python Training/createDLCSAMdataset.py
 2.  **DLCISO**:
 ```bash
 python Training/createDLCISOdataset.py 
+```
+3.  **DLC-TI**:
+```bash
+python Training/createDLC-TIdataset.py 
 ```
 
 ## 2. Training DeepLabCut
